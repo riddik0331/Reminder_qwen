@@ -22,7 +22,7 @@ from theme import (
     MONTH_NAMES, METRICS
 )
 from models import DataManager
-from widgets import EventCard, MaterialTextInput
+from widgets import EventCard, MaterialTextInput, MaterialButton, FloatingActionButton, Snackbar
 from utils import validate_date, export_events_to_csv, get_upcoming_anniversaries, search_events
 
 
@@ -35,6 +35,7 @@ class MainScreen(Screen):
         self.name = "main"
         self.current_filter = None
         self.search_query = ""
+        self.snackbar = None
 
         with self.canvas.before:
             Color(*BG_DARK)
@@ -54,18 +55,13 @@ class MainScreen(Screen):
         search_layout = self._create_search_bar()
         main_layout.add_widget(search_layout)
 
-        # Notification label
-        self.notification_label = Label(
-            text="", size_hint_y=None, height=35,
-            color=TEXT_GREEN, bold=True, markup=True, font_size=14
-        )
-        main_layout.add_widget(self.notification_label)
-
-        # Filter button
-        filter_btn = Button(
-            text="Filter by Month", size_hint_y=None, height=42,
-            background_normal='', background_color=BG_BUTTON,
-            color=TEXT_MAIN, bold=True, font_size=14
+        # Filter button with Material style
+        filter_btn = MaterialButton(
+            text="📅 Filter by Month",
+            size_hint_y=None,
+            height=42,
+            style="outlined",
+            corner_radius=8
         )
         filter_btn.bind(on_press=lambda x: setattr(self.manager, "current", "filter"))
         main_layout.add_widget(filter_btn)
@@ -83,16 +79,20 @@ class MainScreen(Screen):
         scroll.add_widget(self.events_container)
         main_layout.add_widget(scroll)
 
-        # Add button
-        add_btn = Button(
-            text="+  Add Event", size_hint_y=None, height=55,
-            background_normal='', background_color=BTN_SUCCESS,
-            color=BG_DARK, bold=True, font_size=18
-        )
-        add_btn.bind(on_press=lambda x: setattr(self.manager, "current", "add"))
-        main_layout.add_widget(add_btn)
-
         self.add_widget(main_layout)
+
+        # Floating Action Button (FAB)
+        self.fab = FloatingActionButton(
+            icon="+",
+            pos=(self.width - 70, 20),
+            size=(56, 56)
+        )
+        self.fab.bind(on_press=lambda x: setattr(self.manager, "current", "add"))
+        self.add_widget(self.fab)
+        self.bind(size=self._update_fab_pos)
+
+    def _update_fab_pos(self, instance, value):
+        self.fab.pos = (self.width - 70, 20)
 
     def _create_search_bar(self):
         """Create search bar layout."""
@@ -155,14 +155,21 @@ class MainScreen(Screen):
         """Export events to CSV file."""
         events = self.data_manager.events
         if not events:
-            self.show_message("No events to export", TEXT_YELLOW)
+            self.show_snackbar("No events to export", duration=2)
             return
         filename = export_events_to_csv(events)
-        self.show_message(f"Exported: {filename}", TEXT_GREEN)
+        self.show_snackbar(f"✓ Exported: {filename}", duration=3)
+
+    def show_snackbar(self, text, duration=3):
+        """Show snackbar notification."""
+        if self.snackbar and self.snackbar.parent:
+            self.snackbar.dismiss()
+        self.snackbar = Snackbar(text=text, duration=duration)
+        self.snackbar.show(self)
 
     def show_message(self, text, color):
-        self.notification_label.text = f"[b]{text}[/b]"
-        self.notification_label.color = color
+        """Legacy method - now uses snackbar."""
+        self.show_snackbar(text, duration=3)
 
     def refresh_events(self, month_filter: int = None):
         self.current_filter = month_filter
@@ -245,14 +252,17 @@ class MainScreen(Screen):
     def delete_event(self, event_id: int):
         self.data_manager.remove_event(event_id)
         self.refresh_events()
+        self.show_snackbar("Event deleted", duration=2)
 
     def check_notifications(self):
+        """Check for today's events and show snackbar."""
         today_events = self.data_manager.get_today_events()
         if today_events:
             names = ", ".join(e.name for e in today_events)
-            self.notification_label.text = f"[b]Today: {names}![/b]"
-        else:
-            self.notification_label.text = ""
+            # Show notification for today's events (only once per session)
+            if not hasattr(self, '_shown_today_notification'):
+                self.show_snackbar(f"🎉 Today: {names}!", duration=5)
+                self._shown_today_notification = True
 
 
 class AddEventScreen(Screen):
@@ -306,10 +316,9 @@ class AddEventScreen(Screen):
         )
         date_layout.add_widget(self.date_input)
 
-        calendar_btn = Button(
+        calendar_btn = MaterialButton(
             text="📅", size_hint=(None, None), size=(50, 45),
-            background_normal='', background_color=BG_BUTTON,
-            color=TEXT_MAIN, bold=True, font_size=20
+            style="contained", corner_radius=8
         )
         calendar_btn.bind(on_press=lambda x: self.open_calendar())
         date_layout.add_widget(calendar_btn)
@@ -322,22 +331,22 @@ class AddEventScreen(Screen):
         )
         layout.add_widget(self.message_label)
 
-        # Save and Cancel buttons
+        # Save and Cancel buttons with Material style
         btn_layout = BoxLayout(
             orientation="horizontal", size_hint_y=None, height=50, spacing=15
         )
-        save_btn = Button(
-            text="Save Event", background_normal='',
-            background_color=BTN_SUCCESS, color=BG_DARK,
-            bold=True, font_size=16
+        save_btn = MaterialButton(
+            text="Save Event",
+            style="contained",
+            corner_radius=8
         )
         save_btn.bind(on_press=lambda x: self.save_event())
         btn_layout.add_widget(save_btn)
 
-        cancel_btn = Button(
-            text="Cancel", background_normal='',
-            background_color=BG_BUTTON, color=TEXT_MAIN,
-            bold=True, font_size=16
+        cancel_btn = MaterialButton(
+            text="Cancel",
+            style="outlined",
+            corner_radius=8
         )
         cancel_btn.bind(on_press=lambda x: setattr(self.manager, "current", "main"))
         btn_layout.add_widget(cancel_btn)
@@ -367,37 +376,47 @@ class AddEventScreen(Screen):
         self.date_input.text = ""
         self.message_label.text = ""
 
-    def save_event(self):
+    def save_event(self, instance=None):
         """Save the new event."""
         name = self.name_input.text.strip()
         date = self.date_input.text.strip()
 
         # Validate name
         if not name:
-            self.message_label.text = "[color=#F3D182]Please enter an event name[/color]"
+            self.show_error("Please enter an event name")
             self.name_input.focus = True
             return
 
         if len(name) < 2:
-            self.message_label.text = "[color=#F3D182]Name must be at least 2 characters[/color]"
+            self.show_error("Name must be at least 2 characters")
             self.name_input.focus = True
             return
 
         # Validate date
         is_valid, error_msg = validate_date(date)
         if not is_valid:
-            self.message_label.text = f"[color=#F3D182]{error_msg}[/color]"
+            self.show_error(error_msg)
             self.date_input.focus = True
             return
 
         # Save event
         self.data_manager.add_event(name, date)
 
-        # Clear and return
+        # Clear and show success
         self.name_input.text = ""
         self.date_input.text = ""
         self.message_label.text = ""
+        
+        # Show success snackbar on main screen
+        main_screen = self.manager.get_screen("main")
+        if main_screen:
+            main_screen.show_snackbar("✓ Event saved!", duration=2)
+        
         self.manager.current = "main"
+
+    def show_error(self, message):
+        """Show error message."""
+        self.message_label.text = f"[color=#EB8282]{message}[/color]"
 
 
 class CalendarPopup(Popup):

@@ -6,7 +6,7 @@ and organizes events by months.
 
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import ScreenManager, SlideTransition, FadeTransition
 
 from theme import METRICS
 from models import DataManager
@@ -25,19 +25,33 @@ class EventsReminderApp(App):
 
     def build(self):
         self.title = "Events Reminder"
-        sm = ScreenManager()
-        
+        sm = ScreenManager(transition=SlideTransition(duration=0.25))
+
         self.main_screen = MainScreen(self.data_manager)
         self.add_screen = AddEventScreen(self.data_manager)
         self.filter_screen = FilterScreen(self.data_manager)
         self.stats_screen = StatsScreen(self.data_manager)
-        
+
         sm.add_widget(self.main_screen)
         sm.add_widget(self.add_screen)
         sm.add_widget(self.filter_screen)
         sm.add_widget(self.stats_screen)
-        
+
+        # Bind to screen changes for custom transitions
+        sm.bind(current=self.on_screen_change)
+
         return sm
+
+    def on_screen_change(self, sm, value):
+        """Handle screen transitions with custom animations."""
+        if value == "main":
+            sm.transition = SlideTransition(direction="left", duration=0.25)
+        elif value == "add":
+            sm.transition = SlideTransition(direction="up", duration=0.25)
+        elif value == "filter":
+            sm.transition = SlideTransition(direction="up", duration=0.25)
+        elif value == "stats":
+            sm.transition = FadeTransition(duration=0.25)
 
 
 if __name__ == "__main__":
