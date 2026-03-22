@@ -139,7 +139,7 @@ class EventCard(MaterialCard):
         info_layout = BoxLayout(orientation="vertical", spacing=4)
 
         name_label = Label(
-            text=f"[color={TEXT_MAIN[0]:.2f}{TEXT_MAIN[1]:.2f}{TEXT_MAIN[2]:.2f}][b]{event.name}[/b][/color]",
+            text=f"[color=#EBEEF4][b]{event.name}[/b][/color]",
             halign="left", valign="top", markup=True,
             size_hint_x=1, font_size=16
         )
