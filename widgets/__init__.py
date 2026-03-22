@@ -74,7 +74,11 @@ class RippleBehavior:
 
     def _clear_ripple(self, dt):
         if hasattr(self, '_ripple_ellipse') and self._ripple_ellipse:
-            self.canvas.after.remove(self._ripple_ellipse.parent)
+            try:
+                self.canvas.after.remove(self._ripple_color_instr)
+                self.canvas.after.remove(self._ripple_ellipse)
+            except:
+                pass
             self._ripple_ellipse = None
 
     def _update_ripple(self, instance, value):
@@ -193,8 +197,16 @@ class MaterialButton(Button, MaterialWidget):
             anim.start(ripple)
             fade_anim = Animation(a=0, duration=0.4)
             fade_anim.start(ripple_color)
-            Clock.schedule_once(lambda dt: self.canvas.after.remove(ripple.parent)
-                                if ripple.parent in self.canvas.after else None, 0.5)
+            
+            # Clean up ripple after animation
+            def cleanup_ripple(dt):
+                try:
+                    self.canvas.after.remove(ripple_color)
+                    self.canvas.after.remove(ripple)
+                except:
+                    pass
+            
+            Clock.schedule_once(cleanup_ripple, 0.5)
 
         return super().on_touch_down(touch)
 
