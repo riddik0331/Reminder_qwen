@@ -1285,12 +1285,12 @@ class StatsScreen(Screen):
         content.add_widget(summary_card)
 
         # Events by month
-        month_card = self.create_stat_card("Events by Month", 400)
-        months_scroll = ScrollView(size_hint_y=None, height=350, do_scroll_x=False)
-        self.months_layout = BoxLayout(orientation="vertical", spacing=3)
+        month_card = self.create_stat_card("Events by Month", 420)
+        self.months_scroll = ScrollView(size_hint_y=None, height=370, do_scroll_x=False)
+        self.months_layout = BoxLayout(orientation="vertical", spacing=5)
         self.months_layout.bind(minimum_height=self.months_layout.setter("height"))
-        months_scroll.add_widget(self.months_layout)
-        month_card.add_widget(months_scroll)
+        self.months_scroll.add_widget(self.months_layout)
+        month_card.add_widget(self.months_scroll)
         content.add_widget(month_card)
 
         # Upcoming anniversaries
@@ -1383,22 +1383,23 @@ class StatsScreen(Screen):
         # Events by month
         self.months_layout.clear_widgets()
         events_by_month = self.data_manager.get_events_sorted_by_month()
-        max_count = max((len(v) for v in events_by_month.values()), default=0)
 
         for month in range(1, 13):
             count = len(events_by_month.get(month, []))
-            bar_width = 0.3 + (0.7 * count / max_count) if max_count > 0 else 0.3
             color = TEXT_ACCENT if count > 0 else TEXT_MUTED
 
             bar = Label(
                 text=f"[color={color}]{MONTH_NAMES[month]}:[/color] [b]{count}[/b]",
-                size_hint_x=bar_width,
                 size_hint_y=None,
                 height=28,
-                halign="left",
+                halign="center",
                 markup=True
             )
             self.months_layout.add_widget(bar)
+
+        # Scroll to top to show January
+        from kivy.clock import Clock
+        Clock.schedule_once(lambda dt: setattr(self.months_scroll, 'scroll_y', 1.0), 0.1)
 
         # Upcoming anniversaries (next 30 days)
         self.anniversary_layout.clear_widgets()
