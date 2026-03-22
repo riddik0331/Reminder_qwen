@@ -42,3 +42,9 @@ exports/
 
 # Logs
 *.log
+
+# Screenshots
+*.jpg
+*.png
+*.jpeg
+Знімок*.jpg
