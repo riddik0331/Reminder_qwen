@@ -1284,9 +1284,9 @@ class StatsScreen(Screen):
         summary_card.add_widget(self.total_label)
         content.add_widget(summary_card)
 
-        # Events by month
-        month_card = self.create_stat_card("Events by Month", 420)
-        self.months_scroll = ScrollView(size_hint_y=None, height=370, do_scroll_x=False)
+        # Events by month - increased height to show all 12 months
+        month_card = self.create_stat_card("Events by Month", 450)
+        self.months_scroll = ScrollView(size_hint_y=None, height=400, do_scroll_x=False)
         self.months_layout = BoxLayout(orientation="vertical", spacing=5)
         self.months_layout.bind(minimum_height=self.months_layout.setter("height"))
         self.months_scroll.add_widget(self.months_layout)
@@ -1397,9 +1397,7 @@ class StatsScreen(Screen):
             )
             self.months_layout.add_widget(bar)
 
-        # Scroll to top to show January
-        from kivy.clock import Clock
-        Clock.schedule_once(lambda dt: setattr(self.months_scroll, 'scroll_y', 1.0), 0.1)
+        # All 12 months should now be visible (400px height)
 
         # Upcoming anniversaries (next 30 days)
         self.anniversary_layout.clear_widgets()
