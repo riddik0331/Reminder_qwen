@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "name": "New Year's Day",
+    "date": "2025-01-01"
+  },
+  {
+    "id": 2,
+    "name": "Winter Birthday - Anna",
+    "date": "1995-01-15"
+  },
+  {
+    "id": 3,
+    "name": "Martin Luther King Jr. Day",
+    "date": "2025-01-20"
+  },
+  {
+    "id": 4,
+    "name": "Groundhog Day",
+    "date": "2025-02-02"
+  },
+  {
+    "id": 5,
+    "name": "Valentine's Day",
+    "date": "2025-02-14"
+  },
+  {
+    "id": 6,
+    "name": "Presidents' Day",
+    "date": "2025-02-17"
+  },
+  {
+    "id": 7,
+    "name": "St. Patrick's Day",
+    "date": "2025-03-17"
+  },
+  {
+    "id": 8,
+    "name": "Spring Equinox",
+    "date": "2025-03-20"
+  },
+  {
+    "id": 9,
+    "name": "April Fool's Day",
+    "date": "2025-04-01"
+  },
+  {
+    "id": 10,
+    "name": "Earth Day",
+    "date": "2025-04-22"
+  },
+  {
+    "id": 11,
+    "name": "Mother's Day",
+    "date": "2025-05-11"
+  },
+  {
+    "id": 12,
+    "name": "Memorial Day",
+    "date": "2025-05-26"
+  },
+  {
+    "id": 13,
+    "name": "Father's Day",
+    "date": "2025-06-15"
+  },
+  {
+    "id": 14,
+    "name": "Summer Solstice",
+    "date": "2025-06-21"
+  },
+  {
+    "id": 15,
+    "name": "Independence Day",
+    "date": "2025-07-04"
+  },
+  {
+    "id": 16,
+    "name": "Summer Vacation Start",
+    "date": "2025-07-15"
+  },
+  {
+    "id": 17,
+    "name": "Labor Day",
+    "date": "2025-09-01"
+  },
+  {
+    "id": 18,
+    "name": "Autumn Equinox",
+    "date": "2025-09-22"
+  },
+  {
+    "id": 19,
+    "name": "Halloween",
+    "date": "2025-10-31"
+  },
+  {
+    "id": 20,
+    "name": "Thanksgiving",
+    "date": "2025-11-27"
+  },
+  {
+    "id": 21,
+    "name": "Winter Birthday - John",
+    "date": "1988-11-10"
+  },
+  {
+    "id": 22,
+    "name": "Christmas Eve",
+    "date": "2025-12-24"
+  },
+  {
+    "id": 23,
+    "name": "Christmas Day",
+    "date": "2025-12-25"
+  },
+  {
+    "id": 24,
+    "name": "New Year's Eve",
+    "date": "2025-12-31"
+  },
+  {
+    "id": 25,
+    "name": "Family Anniversary",
+    "date": "2010-08-20"
+  },
+  {
+    "id": 26,
+    "name": "Сегодня",
+    "date": "2026-03-21"
+  }
+]
