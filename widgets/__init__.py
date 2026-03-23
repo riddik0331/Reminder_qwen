@@ -16,7 +16,7 @@ from kivy.clock import Clock
 from kivy.metrics import dp
 
 from theme import (
-    SURFACE_COLOR, BG_INPUT, BG_BUTTON,
+    SURFACE_COLOR, BG_INPUT, BG_BUTTON, BG_CARD,
     TEXT_MAIN, TEXT_MUTED, TEXT_ACCENT,
     BTN_DANGER, ERROR_COLOR, PRIMARY_COLOR,
     BTN_SUCCESS, METRICS
@@ -149,15 +149,15 @@ class MaterialButton(Button, MaterialWidget):
         # Set appearance based on style
         if style == "contained":
             self.background_color = PRIMARY_COLOR
-            self.color = (1, 1, 1, 1)
+            self.color = (1, 1, 1, 1)  # White text
             self.elevation = 2
         elif style == "outlined":
             self.background_color = (0, 0, 0, 0)
-            self.color = PRIMARY_COLOR
+            self.color = (1, 1, 1, 1)  # White text
             self.elevation = 0
         else:  # text button
             self.background_color = (0, 0, 0, 0)
-            self.color = PRIMARY_COLOR
+            self.color = (1, 1, 1, 1)  # White text
             self.elevation = 0
 
         self._draw_border()
@@ -271,29 +271,28 @@ class FloatingActionButton(Button, MaterialWidget):
 
 
 class MaterialTextInput(TextInput):
-    """Material Design TextInput with floating label."""
+    """Material Design TextInput with custom styling."""
 
-    def __init__(self, hint_text="", multiline=False, **kwargs):
+    def __init__(self, hint_text="", multiline=False, font_size=15, padding=[10, 10], **kwargs):
+        # Initialize with basic TextInput properties
         super().__init__(
             hint_text=hint_text,
             background_color=BG_INPUT,
-            foreground_color=TEXT_MAIN,
-            hint_text_color=TEXT_MUTED,
+            foreground_color=(1, 1, 1, 1),
+            hint_text_color=(0.55, 0.59, 0.68, 1),
+            cursor_color=(1, 1, 1, 1),
             multiline=multiline,
+            font_size=font_size,
+            padding=padding,
             **kwargs
         )
-        self.focused = False
-        self.bind(focus=self._on_focus)
-
-    def _on_focus(self, instance, value):
-        self.focused = value
 
 
 class EventCard(MaterialCard):
     """Widget for displaying a single event with Material Design styling."""
 
     def __init__(self, event, on_delete=None, **kwargs):
-        super().__init__(elevation=2, corner_radius=8, **kwargs)
+        super().__init__(elevation=2, corner_radius=8, bg_color=BG_CARD, **kwargs)
         self.event = event
         self.on_delete_callback = on_delete
         self.height = 85
@@ -318,20 +317,20 @@ class EventCard(MaterialCard):
         # Event info
         info_layout = BoxLayout(orientation="vertical", spacing=4)
 
-        # Event name
+        # Event name - bright white text
         name_label = Label(
-            text=f"[color=#EBEEF4][b]{event.name}[/b][/color]",
+            text=f"[color=#FFFFFF][b]{event.name}[/b][/color]",
             halign="left", valign="top", markup=True,
             size_hint_x=1, font_size=15
         )
 
-        # Date and anniversary
+        # Date and anniversary - light gray text
         date_str = f"{event.get_day():02d}.{event.get_month():02d}.{event.date[:4]}"
         anniversary = event.get_anniversary()
         if anniversary > 0:
-            date_text = f"[color=#8C96AD]{date_str}[/color]  [color=#94D19E]({anniversary} years)[/color]"
+            date_text = f"[color=#B0B0B0]{date_str}[/color]  [color=#7CB342]({anniversary} years)[/color]"
         else:
-            date_text = f"[color=#8C96AD]{date_str}[/color]"
+            date_text = f"[color=#B0B0B0]{date_str}[/color]"
 
         date_label = Label(
             text=date_text, halign="left", valign="bottom",
@@ -341,15 +340,17 @@ class EventCard(MaterialCard):
         info_layout.add_widget(name_label)
         info_layout.add_widget(date_label)
 
-        # Delete button with Material style
-        delete_btn = MaterialButton(
-            text="✕",
+        # Delete button - simple Button with red X
+        from kivy.uix.button import Button as KivyButton
+        delete_btn = KivyButton(
+            text="X",
             size_hint=(None, None),
             size=(40, 40),
-            style="text",
-            color=ERROR_COLOR,
-            font_size=16,
-            corner_radius=20
+            background_normal='',
+            background_color=(0, 0, 0, 0),  # Transparent
+            color=(0.92, 0.51, 0.51, 1),  # Red color
+            font_size=22,
+            bold=True
         )
         delete_btn.bind(on_press=self._on_delete)
 

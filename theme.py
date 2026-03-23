@@ -16,14 +16,14 @@ ERROR_COLOR = (0.96, 0.35, 0.43, 1)        # Red 500
 
 # Nord Dark Theme Colors - Main palette
 BG_DARK = (0.12, 0.14, 0.18, 1)            # #1E232E - Main background
-BG_CARD = (0.18, 0.21, 0.27, 1)            # #2E3545 - Card background
+BG_CARD = (0.18, 0.21, 0.27, 1)            # #2E3545 - Card background (lighter for contrast)
 BG_BUTTON = (0.25, 0.29, 0.38, 1)          # #404A61 - Secondary buttons
 BG_INPUT = (0.15, 0.17, 0.22, 1)           # #262B38 - Input fields
 
-TEXT_MAIN = (0.92, 0.93, 0.96, 1)          # #EBEEF4 - Primary text
-TEXT_MUTED = (0.55, 0.59, 0.68, 1)         # #8C96AD - Secondary text
+TEXT_MAIN = (1.0, 1.0, 1.0, 1)             # #FFFFFF - Primary text (pure white)
+TEXT_MUTED = (0.69, 0.69, 0.69, 1)         # #B0B0B0 - Secondary text (light gray)
 TEXT_ACCENT = (0.49, 0.73, 0.91, 1)        # #7DBAF8 - Blue accent
-TEXT_GREEN = (0.58, 0.82, 0.62, 1)         # #94D19E - Green success
+TEXT_GREEN = (0.49, 0.70, 0.26, 1)         # #7CB342 - Green (Material)
 TEXT_YELLOW = (0.95, 0.82, 0.51, 1)        # #F3D182 - Yellow warning
 TEXT_RED = (0.92, 0.51, 0.51, 1)           # #EB8282 - Red danger
 TEXT_PURPLE = (0.75, 0.62, 0.93, 1)        # #C09EED - Purple accent

@@ -2,15 +2,22 @@
 Events Reminder App - Main Entry Point
 A reminder application that stores important dates, calculates anniversaries,
 and organizes events by months.
+
+Features:
+- Minimize to system tray
+- Context menu for restore/exit
+- Material Design UI
 """
 
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager, SlideTransition, FadeTransition
+from kivy.clock import Clock
 
 from theme import METRICS
 from models import DataManager
 from screens import MainScreen, AddEventScreen, FilterScreen, StatsScreen
+from tray import TrayIcon
 
 # Set window size
 Window.size = METRICS['window_size']
@@ -22,6 +29,8 @@ class EventsReminderApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.data_manager = DataManager()
+        self.tray_icon = None
+        self._window_closed = False
 
     def build(self):
         self.title = "Events Reminder"
@@ -42,6 +51,22 @@ class EventsReminderApp(App):
 
         return sm
 
+    def on_start(self):
+        """Initialize tray icon after app starts."""
+        self.tray_icon = TrayIcon(self)
+        self.tray_icon.start()
+        
+        # Bind window close event
+        Window.bind(on_request_close=self.on_window_close)
+
+    def on_window_close(self, window):
+        """Handle window close request - minimize to tray instead."""
+        if self.tray_icon and not self.tray_icon._minimized_to_tray:
+            # Minimize to tray
+            self.tray_icon.on_minimize(self.tray_icon.icon, None)
+            return True  # Prevent window close
+        return False  # Allow close if exiting from tray menu
+
     def on_screen_change(self, sm, value):
         """Handle screen transitions with custom animations."""
         if value == "main":
@@ -52,6 +77,11 @@ class EventsReminderApp(App):
             sm.transition = SlideTransition(direction="up", duration=0.25)
         elif value == "stats":
             sm.transition = FadeTransition(duration=0.25)
+
+    def on_stop(self):
+        """Clean up when app stops."""
+        if self.tray_icon:
+            self.tray_icon.stop()
 
 
 if __name__ == "__main__":

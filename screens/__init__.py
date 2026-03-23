@@ -57,10 +57,10 @@ class MainScreen(Screen):
 
         # Filter button with Material style
         filter_btn = MaterialButton(
-            text="📅 Filter by Month",
+            text="Filter by Month",
             size_hint_y=None,
             height=42,
-            style="outlined",
+            style="contained",
             corner_radius=8
         )
         filter_btn.bind(on_press=lambda x: setattr(self.manager, "current", "filter"))
@@ -100,14 +100,22 @@ class MainScreen(Screen):
             orientation="horizontal", size_hint_y=None, height=45, spacing=10
         )
         self.search_input = MaterialTextInput(
-            hint_text="Search events...", font_size=15, padding=[12, 12]
+            hint_text="Search events...",
+            font_size=15,
+            padding=[12, 12],
+            multiline=False,
+            size_hint_y=None,
+            height=45
         )
         self.search_input.bind(text=self.on_search_text)
         layout.add_widget(self.search_input)
 
-        clear_btn = Button(
-            text="Clear", background_normal='', background_color=BG_BUTTON,
-            color=TEXT_MAIN, bold=True, font_size=14
+        clear_btn = MaterialButton(
+            text="Clear",
+            size_hint=(None, None),
+            size=(80, 45),
+            style="contained",
+            corner_radius=8
         )
         clear_btn.bind(on_press=lambda x: self.clear_search())
         layout.add_widget(clear_btn)
@@ -118,16 +126,18 @@ class MainScreen(Screen):
         layout = BoxLayout(
             orientation="horizontal", size_hint_y=None, height=42, spacing=10
         )
-        stats_btn = Button(
-            text="Statistics", background_normal='', background_color=BG_BUTTON,
-            color=TEXT_ACCENT, bold=True, font_size=14
+        stats_btn = MaterialButton(
+            text="Statistics",
+            style="contained",
+            corner_radius=8
         )
         stats_btn.bind(on_press=lambda x: setattr(self.manager, "current", "stats"))
         layout.add_widget(stats_btn)
 
-        export_btn = Button(
-            text="Export CSV", background_normal='', background_color=BG_BUTTON,
-            color=TEXT_PURPLE, bold=True, font_size=14
+        export_btn = MaterialButton(
+            text="Export CSV",
+            style="contained",
+            corner_radius=8
         )
         export_btn.bind(on_press=lambda x: self.export_events())
         layout.add_widget(export_btn)
@@ -158,7 +168,7 @@ class MainScreen(Screen):
             self.show_snackbar("No events to export", duration=2)
             return
         filename = export_events_to_csv(events)
-        self.show_snackbar(f"✓ Exported: {filename}", duration=3)
+        self.show_snackbar(f"Exported: {filename}", duration=3)
 
     def show_snackbar(self, text, duration=3):
         """Show snackbar notification."""
@@ -261,7 +271,7 @@ class MainScreen(Screen):
             names = ", ".join(e.name for e in today_events)
             # Show notification for today's events (only once per session)
             if not hasattr(self, '_shown_today_notification'):
-                self.show_snackbar(f"🎉 Today: {names}!", duration=5)
+                self.show_snackbar(f"Today: {names}!", duration=5)
                 self._shown_today_notification = True
 
 
@@ -295,8 +305,12 @@ class AddEventScreen(Screen):
         layout.add_widget(name_label)
 
         self.name_input = MaterialTextInput(
-            hint_text="Enter event name", font_size=16,
-            padding=[12, 12], multiline=False
+            hint_text="Enter event name",
+            font_size=16,
+            padding=[12, 12],
+            multiline=False,
+            size_hint_y=None,
+            height=45
         )
         layout.add_widget(self.name_input)
 
@@ -311,13 +325,17 @@ class AddEventScreen(Screen):
             orientation="horizontal", size_hint_y=None, height=45, spacing=10
         )
         self.date_input = MaterialTextInput(
-            hint_text="2025-03-15", font_size=16,
-            padding=[12, 12], multiline=False
+            hint_text="2025-03-15",
+            font_size=16,
+            padding=[12, 12],
+            multiline=False,
+            size_hint_y=None,
+            height=45
         )
         date_layout.add_widget(self.date_input)
 
         calendar_btn = MaterialButton(
-            text="📅", size_hint=(None, None), size=(50, 45),
+            text="Date", size_hint=(None, None), size=(60, 45),
             style="contained", corner_radius=8
         )
         calendar_btn.bind(on_press=lambda x: self.open_calendar())
@@ -345,7 +363,7 @@ class AddEventScreen(Screen):
 
         cancel_btn = MaterialButton(
             text="Cancel",
-            style="outlined",
+            style="contained",
             corner_radius=8
         )
         cancel_btn.bind(on_press=lambda x: setattr(self.manager, "current", "main"))
@@ -410,7 +428,7 @@ class AddEventScreen(Screen):
         # Show success snackbar on main screen
         main_screen = self.manager.get_screen("main")
         if main_screen:
-            main_screen.show_snackbar("✓ Event saved!", duration=2)
+            main_screen.show_snackbar("Event saved!", duration=2)
         
         self.manager.current = "main"
 
@@ -630,6 +648,8 @@ class CalendarPopup(Popup):
     def select_day(self, day):
         """Select a day."""
         self.selected_day = day
+        # Update current_date to reflect the selected month/year
+        self.current_date = datetime(self.current_year, self.current_month, day)
         self._build_calendar()
 
     def select_date(self):
@@ -648,7 +668,8 @@ class FilterScreen(Screen):
         self.data_manager = data_manager
         self.name = "filter"
 
-        with self.canvas.before:
+        # Draw background
+        with self.canvas:
             Color(*BG_DARK)
             self.bg_rect = Rectangle(pos=self.pos, size=self.size)
         self.bind(pos=self._update_bg, size=self._update_bg)
@@ -662,36 +683,41 @@ class FilterScreen(Screen):
         )
         layout.add_widget(header)
 
-        # Month buttons grid
+        # Month buttons grid with Material style
         grid = GridLayout(cols=3, spacing=10, size_hint_y=None)
         grid.bind(minimum_height=grid.setter("height"))
 
         for month_num in range(1, 13):
-            btn = Button(
+            btn = MaterialButton(
                 text=MONTH_NAMES[month_num],
-                background_normal='', background_color=BG_BUTTON,
-                color=TEXT_MAIN, bold=True, font_size=13,
-                size_hint_y=None, height=45
+                size_hint_y=None,
+                height=45,
+                style="contained",
+                corner_radius=8
             )
             btn.bind(on_press=lambda x, m=month_num: self.select_month(m))
             grid.add_widget(btn)
 
         layout.add_widget(grid)
 
-        # Clear filter button
-        clear_btn = Button(
-            text="Show All Events", size_hint_y=None, height=45,
-            background_normal='', background_color=BG_BUTTON,
-            color=TEXT_MAIN, bold=True, font_size=15
+        # Clear filter button with Material style
+        clear_btn = MaterialButton(
+            text="Show All Events",
+            size_hint_y=None,
+            height=45,
+            style="contained",
+            corner_radius=8
         )
         clear_btn.bind(on_press=lambda x: self.show_all())
         layout.add_widget(clear_btn)
 
-        # Back button
-        back_btn = Button(
-            text="Back", size_hint_y=None, height=45,
-            background_normal='', background_color=BG_BUTTON,
-            color=TEXT_MAIN, bold=True, font_size=15
+        # Back button with Material style
+        back_btn = MaterialButton(
+            text="Back",
+            size_hint_y=None,
+            height=45,
+            style="contained",
+            corner_radius=8
         )
         back_btn.bind(on_press=lambda x: setattr(self.manager, "current", "main"))
         layout.add_widget(back_btn)
@@ -702,12 +728,23 @@ class FilterScreen(Screen):
         self.bg_rect.pos = self.pos
         self.bg_rect.size = self.size
 
+    def on_enter(self):
+        """Refresh background when entering screen."""
+        self.bg_rect.pos = self.pos
+        self.bg_rect.size = self.size
+
     def select_month(self, month: int):
-        self.manager.get_screen("main").current_filter = month
+        """Select a month filter and return to main screen."""
+        main_screen = self.manager.get_screen("main")
+        main_screen.current_filter = month
+        main_screen.refresh_events(month)
         self.manager.current = "main"
 
     def show_all(self):
-        self.manager.get_screen("main").current_filter = None
+        """Clear filter and show all events."""
+        main_screen = self.manager.get_screen("main")
+        main_screen.current_filter = None
+        main_screen.refresh_events()
         self.manager.current = "main"
 
 
