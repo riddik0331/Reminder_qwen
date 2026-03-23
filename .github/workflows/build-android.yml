@@ -63,11 +63,16 @@ jobs:
           mv cmdline-tools latest
           rm cmdline-tools.zip
           
-          # Accept licenses
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          # Setup environment variables
+          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
           
-          # Install required SDK components
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          # Accept licenses
+          yes | sdkmanager --licenses || true
+          
+          # Install required SDK components including aidl
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "tools" "extras;google;google_play_services"
           
           # Go back to project directory
           cd $GITHUB_WORKSPACE
