@@ -7,6 +7,7 @@ Features:
 - Minimize to system tray
 - Context menu for restore/exit
 - Material Design UI
+- System notifications for upcoming events
 """
 
 from kivy.app import App
@@ -18,6 +19,7 @@ from theme import METRICS
 from models import DataManager
 from screens import MainScreen, AddEventScreen, FilterScreen, StatsScreen
 from tray import TrayIcon
+from notifications import NotificationManager
 
 # Set window size
 Window.size = METRICS['window_size']
@@ -30,6 +32,7 @@ class EventsReminderApp(App):
         super().__init__(**kwargs)
         self.data_manager = DataManager()
         self.tray_icon = None
+        self.notification_manager = None
         self._window_closed = False
 
     def build(self):
@@ -52,10 +55,15 @@ class EventsReminderApp(App):
         return sm
 
     def on_start(self):
-        """Initialize tray icon after app starts."""
+        """Initialize tray icon and notifications after app starts."""
+        # Initialize notification manager
+        self.notification_manager = NotificationManager(self.data_manager)
+        self.notification_manager.start_scheduler()
+
+        # Initialize tray icon
         self.tray_icon = TrayIcon(self)
         self.tray_icon.start()
-        
+
         # Bind window close event
         Window.bind(on_request_close=self.on_window_close)
 
@@ -80,6 +88,8 @@ class EventsReminderApp(App):
 
     def on_stop(self):
         """Clean up when app stops."""
+        if self.notification_manager:
+            self.notification_manager.stop_scheduler()
         if self.tray_icon:
             self.tray_icon.stop()
 

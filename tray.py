@@ -55,11 +55,37 @@ class TrayIcon:
         from kivy.clock import Clock
         Clock.schedule_once(lambda dt: self.app.stop(), 0.1)
 
+    def on_toggle_notifications(self, icon, item):
+        """Toggle notifications on/off."""
+        if self.app.notification_manager:
+            current = self.app.notification_manager.settings.get("enabled", True)
+            self.app.notification_manager.enable_notifications(not current)
+
+    def on_test_notification(self, icon, item):
+        """Send a test notification."""
+        if self.app.notification_manager:
+            self.app.notification_manager.send_notification(
+                "✅ Сповіщення працює!",
+                "Налаштування сповіщень працюють коректно."
+            )
+
     def create_menu(self):
         """Create context menu for tray icon."""
+        # Get notification status
+        notif_enabled = False
+        if self.app.notification_manager:
+            notif_enabled = self.app.notification_manager.settings.get("enabled", True)
+
         return pystray.Menu(
             pystray.MenuItem("Restore Events Reminder", self.on_restore, default=True),
             pystray.MenuItem("Minimize to Tray", self.on_minimize, enabled=lambda item: not self._minimized_to_tray),
+            pystray.Menu.SEPARATOR,
+            pystray.MenuItem(
+                "Notifications: ON" if notif_enabled else "Notifications: OFF",
+                self.on_toggle_notifications,
+                checked=lambda item: notif_enabled
+            ),
+            pystray.MenuItem("Test Notification", self.on_test_notification),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Exit", self.on_exit)
         )
