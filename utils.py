@@ -69,8 +69,8 @@ def export_events_to_csv(events, export_dir: str = None) -> str:
     filename = f"events_{timestamp}.csv"
     filepath = export_dir / filename
 
-    # Write CSV
-    with open(filepath, 'w', newline='', encoding='utf-8') as f:
+    # Write CSV with UTF-8-SIG encoding (with BOM for Excel compatibility)
+    with open(filepath, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
         writer.writerow(['ID', 'Event Name', 'Date', 'Day', 'Month', 'Year', 'Anniversary'])
         for event in events:
